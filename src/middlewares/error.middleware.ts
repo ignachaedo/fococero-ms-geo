@@ -1,13 +1,22 @@
-// src/middlewares/error.middleware.ts
+/**
+ * @fileoverview Middleware global de manejo de errores para ms-geo.
+ * Centraliza la captura de excepciones, traduce errores de infraestructura
+ * (Firebase/PostGIS) y garantiza una respuesta estandarizada al cliente.
+ */
 
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../helpers/appError';
 import { logger } from '../config/logger';
 
 /**
- * Middleware: Manejador Global de Errores para ms-geo
- * Centraliza la captura de excepciones, traduce errores de infraestructura (Firebase/PostGIS)
- * y garantiza una respuesta estandarizada al cliente.
+ * Manejador global de errores para ms-geo.
+ * Traduce errores de Firebase Authentication y PostgreSQL/PostGIS a mensajes
+ * legibles para el usuario, con códigos internos para depuración.
+ *
+ * @param err - Error lanzado (puede ser AppError o Error de infraestructura)
+ * @param _req - Objeto de solicitud Express (no utilizado)
+ * @param res - Objeto de respuesta Express
+ * @param _next - Función next de Express (no utilizada)
  */
 export const errorHandler = (
     err: unknown,

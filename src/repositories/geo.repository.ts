@@ -1,4 +1,9 @@
-// src/repositories/geo.repository.ts
+/**
+ * @fileoverview Repositorio de datos geoespaciales para ms-geo.
+ * Encapsula el acceso a la tabla `ubicaciones` en PostgreSQL con PostGIS,
+ * utilizando funciones espaciales como ST_MakePoint, ST_DWithin, ST_GeomFromText
+ * y ST_AsText para operaciones de geolocalización.
+ */
 
 import { QueryConfig } from 'pg';
 import { pool } from '../config/database';
@@ -15,6 +20,12 @@ export class GeoRepository {
     // 🟢 ESCRITURA (INSERT)
     // ============================================================================
 
+    /**
+     * Inserta un nuevo foco de incendio con coordenadas geográficas (PostGIS).
+     *
+     * @param data - DTO con datos del foco y severidad calculada
+     * @returns Foco de incendio recién creado con latitud/longitud
+     */
     static async create(
         data: ICrearFocoDTO & { severidad: SeveridadFoco },
     ): Promise<IUbicacionFoco> {
@@ -62,6 +73,11 @@ export class GeoRepository {
     // 🔵 LECTURA (SELECT & GIS)
     // ============================================================================
 
+    /**
+     * Obtiene todos los focos activos (no eliminados) ordenados por fecha descendente.
+     *
+     * @returns Lista de focos con coordenadas y perímetro WKT
+     */
     static async findAllActive(): Promise<IUbicacionFoco[]> {
         const query = `
             SELECT 
@@ -78,6 +94,12 @@ export class GeoRepository {
         return rows;
     }
 
+    /**
+     * Busca un foco de incendio por su ID.
+     *
+     * @param id - Identificador único del foco
+     * @returns Foco encontrado o null si no existe o fue eliminado
+     */
     static async findById(id: string): Promise<IUbicacionFoco | null> {
         const query: QueryConfig = {
             text: `
@@ -97,6 +119,14 @@ export class GeoRepository {
         return rows[0] || null;
     }
 
+    /**
+     * Busca focos de incendio cercanos a una ubicación usando ST_DWithin.
+     *
+     * @param lat - Latitud del punto de referencia
+     * @param lng - Longitud del punto de referencia
+     * @param radioMetros - Radio de búsqueda en metros
+     * @returns Lista de focos dentro del radio ordenados por distancia
+     */
     static async findNearby(
         lat: number,
         lng: number,
@@ -128,6 +158,13 @@ export class GeoRepository {
     // 🟠 ACTUALIZACIÓN (UPDATE)
     // ============================================================================
 
+    /**
+     * Actualiza el estado operativo de un foco.
+     *
+     * @param id - Identificador único del foco
+     * @param estado - Nuevo estado (ej: REPORTADO, EN_COMBATE, CONTROLADO, EXTINTO)
+     * @returns Foco actualizado o null si no existe
+     */
     static async updateState(id: string, estado: EstadoFoco): Promise<IUbicacionFoco | null> {
         const query: QueryConfig = {
             text: `UPDATE public.ubicaciones SET estado = $1 WHERE id = $2 AND deleted_at IS NULL RETURNING id, estado, updated_at;`,
@@ -137,6 +174,13 @@ export class GeoRepository {
         return rows[0] || null;
     }
 
+    /**
+     * Actualiza el perímetro (área quemada) de un foco usando PostGIS.
+     *
+     * @param id - Identificador único del foco
+     * @param wktPoligono - Polígono en formato WKT (Well-Known Text)
+     * @returns Foco actualizado con el nuevo perímetro WKT o null si no existe
+     */
     static async updatePerimetro(id: string, wktPoligono: string): Promise<IUbicacionFoco | null> {
         const query: QueryConfig = {
             text: `
@@ -152,7 +196,11 @@ export class GeoRepository {
     }
 
     /**
-     * ✅ Actualización Integral (UPDATE ALL)
+     * Actualización integral de un foco usando COALESCE para preservar valores existentes.
+     *
+     * @param id - Identificador único del foco
+     * @param data - DTO con campos a actualizar (incluye severidad recalculada)
+     * @returns Foco actualizado o null si no existe
      */
     static async updateAll(
         id: string,
@@ -190,6 +238,12 @@ export class GeoRepository {
     // 🔴 ELIMINACIÓN (SOFT DELETE)
     // ============================================================================
 
+    /**
+     * Soft delete (eliminación lógica) de un foco de incendio.
+     *
+     * @param id - Identificador único del foco a eliminar
+     * @returns true si se marcó como eliminado, false si no existía
+     */
     static async softDelete(id: string): Promise<boolean> {
         const query: QueryConfig = {
             text: `UPDATE public.ubicaciones SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1 AND deleted_at IS NULL RETURNING id;`,

@@ -1,7 +1,14 @@
-// src/validators/geo.validator.ts
+/**
+ * @fileoverview Esquemas de validación Zod para operaciones geoespaciales.
+ * Define las reglas de validación para creación, actualización, cambio de estado,
+ * actualización de perímetro y consulta de focos cercanos.
+ * Incluye límites geográficos de Chile para validar coordenadas.
+ */
+
 import { z } from 'zod';
 import { EstadoFoco } from '../models/geo.model';
 
+/** Límites geográficos del territorio chileno continental */
 const CHILE_BOUNDS = {
     lat: { min: -56.0, max: -17.0 },
     lng: { min: -76.0, max: -66.0 },

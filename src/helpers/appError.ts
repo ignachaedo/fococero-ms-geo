@@ -1,7 +1,12 @@
 /**
- * AppError: Clase personalizada para la gestión de excepciones operacionales.
- * Extiende la clase Error nativa de Node.js para incluir códigos de estado HTTP
- * y banderas de control para el middleware de errores.
+ * @fileoverview Clase AppError para errores operativos de ms-geo.
+ * Extiende Error nativo para incluir códigos de estado HTTP y banderas
+ * de control (isOperational) para el middleware global de errores.
+ */
+
+/**
+ * Error operativo personalizado para ms-geo.
+ * Indica errores previstos (validación, autorización, etc.) vs. fallos inesperados.
  */
 export class AppError extends Error {
     public readonly statusCode: number;
