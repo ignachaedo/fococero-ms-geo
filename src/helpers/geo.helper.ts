@@ -1,8 +1,4 @@
-/**
- * @fileoverview Utilidades matemáticas y lógicas para operaciones geoespaciales.
- * Módulo 100% puro, sin dependencias externas, diseñado para ser testeable
- * de forma aislada. Proporciona cálculos de severidad basados en reglas de negocio.
- */
+// src/helpers/geo.helper.ts
 
 import { SeveridadFoco } from '../models/geo.model';
 
@@ -14,16 +10,9 @@ export class GeoHelper {
     
     /**
      * Calcula automáticamente la severidad sugerida basada en factores climáticos y humanos.
-     *
-     * @description Reglas de severidad:
-     * - Si hay amenaza a viviendas → CRÍTICA
-     * - Viento >= 40 km/h → ALTA
-     * - Viento >= 20 km/h → MODERADA
-     * - Caso contrario → BAJA
-     *
-     * @param vientoKmh - Velocidad del viento en km/h (por defecto 0)
-     * @param amenazaViviendas - Indicador de riesgo inminente a la población (por defecto false)
-     * @returns Nivel de severidad calculado (SeveridadFoco)
+     * * @param vientoKmh Velocidad del viento en km/h.
+     * @param amenazaViviendas Indicador de riesgo inminente a la población.
+     * @returns {SeveridadFoco} Nivel de severidad calculado.
      */
     static evaluarSeveridad(vientoKmh: number = 0, amenazaViviendas: boolean = false): SeveridadFoco {
         

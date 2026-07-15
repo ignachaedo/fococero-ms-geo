@@ -1,6 +1,6 @@
 // src/index.ts
 
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -13,7 +13,6 @@ import './config/firebase';
 import geoRoutes from './routes/geo.routes';
 import { errorHandler } from './middlewares/error.middleware';
 import { metricsMiddleware, metricsHandler } from './middlewares/metrics.middleware';
-import { internalAuthMiddleware } from './middlewares/internalAuth.middleware';
 import { envs } from './config/envs';
 import { logger } from './config/logger';
 
@@ -66,16 +65,13 @@ app.use('/api/geo', limiter);
 // ============================================================================
 // 🛣️ 3. RUTAS Y ERRORES
 // ============================================================================
-// Salud
-app.get('/api/health', (_req, res) => {
-    res.status(200).json({ ok: true, status: 'UP', service: 'ms-geo', environment: envs.NODE_ENV });
+// Health check para Docker (sin auth)
+app.get('/health', (_req: Request, res: Response) => {
+    res.status(200).json({ status: 'UP', service: 'ms-geo' });
 });
 
 // 📊 Endpoint de métricas Prometheus
 app.get('/metrics', metricsHandler);
-
-// 🔐 Seguridad interna para el resto de las rutas
-app.use(internalAuthMiddleware);
 
 app.use('/api/geo', geoRoutes);
 

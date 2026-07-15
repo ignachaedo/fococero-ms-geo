@@ -1,22 +1,10 @@
-/**
- * @fileoverview Middleware validador universal basado en esquemas Zod.
- * Intercepta las peticiones entrantes y valida body, query y params
- * contra un esquema Zod antes de que lleguen al controlador.
- */
-
+// src/middlewares/validate.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 
 /**
  * Middleware: Validador Universal de Esquemas.
  * Detecta fallos en Body, Query o Params antes de llegar al controlador.
- *
- * @description Factory que retorna un middleware. Ejecuta schema.parseAsync
- * con body, query y params. Si la validación falla (ZodError), responde 400
- * con detalles de los campos inválidos.
- *
- * @param schema - Esquema Zod que define la estructura esperada
- * @returns Middleware function de Express
  */
 export const validateSchema = (schema: ZodSchema) => {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {

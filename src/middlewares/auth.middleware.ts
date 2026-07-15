@@ -1,20 +1,11 @@
-/**
- * @fileoverview Middleware de autenticación Firebase para ms-geo.
- * Valida la firma criptográfica del token JWT de Firebase y asigna
- * el usuario autenticado al objeto Request para uso en controladores.
- */
+// src/middlewares/auth.middleware.ts
 
 import { Request, Response, NextFunction } from 'express';
 import admin from '../config/firebase';
 
 /**
- * Middleware que verifica el token Firebase ID en el header Authorization.
- * Asigna req.user con uid, email y rol (desde custom claims) si es válido.
- * Delega errores de verificación al manejador global de errores.
- *
- * @param req - Objeto de solicitud Express con header Authorization
- * @param res - Objeto de respuesta Express
- * @param next - Función next de Express
+ * Middleware: Autenticación Operativa para ms-geo
+ * Valida la firma criptográfica del Token JWT de Firebase y asigna el usuario al objeto Request.
  */
 export const validateFirebaseToken = async (
     req: Request,

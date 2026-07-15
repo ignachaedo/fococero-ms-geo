@@ -27,9 +27,6 @@ export const envs = {
     // URL del API Gateway (para CORS estricto)
     API_GATEWAY_URL: env.get('API_GATEWAY_URL').default('http://localhost:3000').asString(),
 
-    // Secreto interno para comunicación entre microservicios
-    INTERNAL_SECRET_TOKEN: env.get('INTERNAL_SECRET_TOKEN').required().asString(),
-
     // Firebase
     FIREBASE_PROJECT_ID: env.get('FIREBASE_PROJECT_ID').required().asString(),
     FIREBASE_CLIENT_EMAIL: env.get('FIREBASE_CLIENT_EMAIL').required().asString(),
@@ -40,4 +37,5 @@ export const envs = {
         .replace(/\\n/g, '\n')
         .replace(/"/g, '')
         .trim(),
+    INTERNAL_SECRET_TOKEN: env.get('INTERNAL_SECRET_TOKEN').default('dev-internal-secret').asString(),
 };
