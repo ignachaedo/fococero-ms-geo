@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-geo
+  namespace: fococero
+  labels:
+    app: ms-geo
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ms-geo
+  template:
+    metadata:
+      labels:
+        app: ms-geo
+        tier: backend
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: ms-geo
+          image: 486507079259.dkr.ecr.us-east-1.amazonaws.com/fococero-ms-geo:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+              protocol: TCP
+          env:
+            - name: PORT
+              value: '3002'
+            - name: DB_USER
+              valueFrom: { secretKeyRef: { name: ms-geo-secrets, key: DB_USER } }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: ms-geo-secrets, key: DB_PASSWORD } }
+            - name: DB_HOST
+              value: 'db-fococero'
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_NAME
+              value: 'geo_db'
+            - name: FIREBASE_PROJECT_ID
+              valueFrom:
+                { secretKeyRef: { name: firebase-secret, key: FIREBASE_PROJECT_ID } }
+            - name: FIREBASE_CLIENT_EMAIL
+              valueFrom:
+                { secretKeyRef: { name: firebase-secret, key: FIREBASE_CLIENT_EMAIL } }
+            - name: FIREBASE_PRIVATE_KEY
+              valueFrom:
+                { secretKeyRef: { name: firebase-secret, key: FIREBASE_PRIVATE_KEY } }
+            - name: INTERNAL_SECRET_TOKEN
+              valueFrom:
+                { secretKeyRef: { name: ms-geo-secrets, key: INTERNAL_SECRET_TOKEN } }
+            - name: EUREKA_CLIENT_REGISTERWITHEUREKA
+              value: 'false'
+            - name: EUREKA_CLIENT_FETCHREGISTRY
+              value: 'false'
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '128Mi'
+            limits:
+              cpu: '500m'
+              memory: '256Mi'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2
