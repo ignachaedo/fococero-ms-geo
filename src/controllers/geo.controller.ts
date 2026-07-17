@@ -1,4 +1,4 @@
-// src/controllers/geo.controller.ts
+// src/controllers/geo.controller.tss
 import { Request, Response } from 'express';
 import { GeoService } from '../services/geo.service';
 import { catchAsync } from '../helpers/catchAsync';
